@@ -24,7 +24,7 @@ public class JpaMain {
 
             // JPQL 사용
             // SQL을 추상화한 객체지향SQL
-            // 테이블이 아닌 객체를 대상으로 검색하는 객체지향쿼리
+            // 테이블이 아닌 객체를 대상으로 검색하는 객체지향 쿼리
             List<Member> resultList = em.createQuery("select m from Member as m", Member.class).setFirstResult(0).setMaxResults(5).getResultList();
 
             System.out.println(findMember.getName());
