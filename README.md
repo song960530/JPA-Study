@@ -62,3 +62,30 @@ ORM (객체와 관계형 데이터베이스 매핑)
   - em.flush (직접호출)
   - 트랜잭션 커밋 (자동호출)
   - JPQL 쿼리 실행 (자동호출)
+
+### 엔티티매핑
+- 객체와 테이블 매핑 : @Entity, @Table
+  - @Entity
+    - JPA로 매핑할땐 필수
+    - 기본 생성자 필수
+    - final클래스, enum, interface, inner 클래스 사용 X
+    - 필드값에 final X
+- 필드와 컬럼 매핑 : @Column
+- 기본 키 매핑 : @Id
+- 연관관계 매핑 : @ManyToOne, @JoinColumn
+
+### 매핑 어노테이션
+- @Column : 컬럼 매핑
+  - name : 필드와 매핑할 테이블의 컬럼 이름
+  - insertable,updatable : 등록,변경 가능 여부 (true/false)
+  - nullable : null 허용 어부 설정
+  - unique : Unique 제약조건을 걸때 사용 (잘 사용 안함)
+  - columnDefinitaion : DB에 컬럼 정보를 직접 줄 수 있다
+  - length : 문자 길이 제약 조건
+  - percision,scale : BigDecimal 타입에서 사용
+- @Temporal : 날짜 매핑
+  - java8이상부턴 LocalData, LocalDataTime을 지원해주기 때문에 생략 가능
+- @Enumerated : enum 타입 매핑
+- @Log : BLOB, CLOB매핑
+  - 문자면 CLOB, 나머진 BLOB
+- @Transient : 특정 필드의 컬럼 매핑을 제외
