@@ -27,9 +27,9 @@ public class JpaMain {
             // 테이블이 아닌 객체를 대상으로 검색하는 객체지향 쿼리
             List<Member> resultList = em.createQuery("select m from Member as m", Member.class).setFirstResult(0).setMaxResults(5).getResultList();
 
-            System.out.println(findMember.getName());
+            System.out.println(findMember.getUsername());
             for (Member member : resultList) {
-                System.out.println("Member.name = " + member.getName());
+                System.out.println("Member.name = " + member.getUsername());
             }
             tx.commit();
         } catch (Exception e) {
