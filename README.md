@@ -89,3 +89,8 @@ ORM (객체와 관계형 데이터베이스 매핑)
 - @Log : BLOB, CLOB매핑
   - 문자면 CLOB, 나머진 BLOB
 - @Transient : 특정 필드의 컬럼 매핑을 제외
+
+## 기본키 매핑
+- @GeneratedValue
+- @SequenceGenerator
+- @TaableGenerator
