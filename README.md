@@ -90,7 +90,13 @@ ORM (객체와 관계형 데이터베이스 매핑)
   - 문자면 CLOB, 나머진 BLOB
 - @Transient : 특정 필드의 컬럼 매핑을 제외
 
-## 기본키 매핑
+### 기본키 매핑
 - @GeneratedValue
 - @SequenceGenerator
 - @TaableGenerator
+
+### 연관관계 매핑
+- 객체를 테이블에 맞춰 데이터 중심으로 모델링하면 협력관게를 만들 수 없다
+- 단방향 연관관계 (N -> 1)
+  - @ManyToone(객체의 참조)
+  - @JoinColumn(외리키 매핑)
