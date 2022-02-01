@@ -22,18 +22,19 @@ public class Order {
     @Column(name = "ORDER_ID")
     private Long id;
 
-//    @Column(name = "MEMBER_ID")
-//    private Long memberId;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+
+    private LocalDateTime orderDate;
 
     @ManyToOne
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
+    @OneToOne
+    @JoinColumn(name = "DELIVERY_ID")
+    private Delivery delivery;
+
     @OneToMany(mappedBy = "order")
     private List<OrderItem> orderItems = new ArrayList<>();
-
-    private LocalDateTime orderDate;
-
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
 }
