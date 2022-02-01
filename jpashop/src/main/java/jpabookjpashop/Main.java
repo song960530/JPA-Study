@@ -1,5 +1,7 @@
 package jpabookjpashop;
 
+import jpabookjpashop.domain.Order;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -13,6 +15,7 @@ public class Main {
         EntityManager em = emf.createEntityManager();
 
         EntityTransaction tx = em.getTransaction();
+        tx.begin();
 
         try {
             tx.commit();

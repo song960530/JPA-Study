@@ -18,7 +18,7 @@
             <property name="hibernate.use_sql_comments" value="true"/>
 
             <!--@Entity객체의 DDL을 자동으로 날림. 삭제 -> 생성. 절대 운영에서 사용 금지.-->
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
         </properties>
     </persistence-unit>
 </persistence>
