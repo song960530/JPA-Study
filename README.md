@@ -246,3 +246,8 @@ ORM (객체와 관계형 데이터베이스 매핑)
   - 참조하는 곳이 하나일떄 사용해야하며, 특정 엔티티가 개인으로 소유할 때 사용해야한다
   - @OneToOne, @OneToMany 에서만 사용 가능
   - CascadeType.REMOVE와 동일하게 동작
+
+### 영속성전이 + 고아객체
+  - CascadeType.ALL + orphanRemoval = true
+  - 부모 엔티티를 통해 자식의 생명주기를 관리할 수 있음
+  - DDD의 Aggregate Root 개념을 구현할 때 유용
