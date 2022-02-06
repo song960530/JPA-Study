@@ -219,3 +219,14 @@ ORM (객체와 관계형 데이터베이스 매핑)
     - PersistenceUnitUtil.isLoaded(); -> 프록시 인스턴스 초기화 여부
     - getClass().getName() -> 프록시 클래스 확인
     - Hibernate.initialize() -> 강제 초기화 (참고로 JPA 표준은 강제 초기화가 없음 표준은 member.getName() 이런식)
+
+### 지연로딩
+  - 단방향,양방향 어노테이션 속성에 featch = FetchType.LAZY로 설정 EX) @ManyToOne(featch = FetchType.LAZY)
+  - **✨모든 연관관계에선 지연로딩을 사용할 것✨**
+  - 즉시로딩이 필요한 경우 JPQL fetch 조인이나, 엔티티 그래프 기능을 사용
+
+### 즉시로딩 (실무에선 즉시로딩을 그냥 사용하지 말것)
+  - 단방향,양방향 어노테이션 속성에 featch = FetchType.LAZY로 설정 EX) @ManyToOne(featch = FetchType.EAGER)
+  - 🔥즉시로딩을 사용하면 예상하지 못한 SQL이 발생할 수 있으며 JPQL에선 N+1 문제를 일으킨다 (하나의 쿼리를 위해 N개의 쿼리가 더 발생하는 현상)🔥
+  - **🔥@ManyToOne, @OneToOne은 기본이 즉시 로딩이니 꼭 LAZY로 설정을 변경하여 사용해야함🔥**
+  - @OneToMany, @ManyToMany는 기본이 지연 로딩
