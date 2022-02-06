@@ -240,4 +240,9 @@ ORM (객체와 관계형 데이터베이스 매핑)
   - 영속성 전이는 연관관계 매핑하는 것과 아무 관련이 없으며, 함께 영속화 한다는 편리함을 제공하는것이다
   - ALL, PERSIST, REMOVE, MERGE, REFRESH, DETACH를 속성으로 사용할 수 있다
 
-
+### 고아객체
+  - orphanRemoval = true 속성
+  - 고아객체제거 : 부모와 연관관계가 끊어진 자식 엔티티를 자동으로 삭제
+  - 참조하는 곳이 하나일떄 사용해야하며, 특정 엔티티가 개인으로 소유할 때 사용해야한다
+  - @OneToOne, @OneToMany 에서만 사용 가능
+  - CascadeType.REMOVE와 동일하게 동작
