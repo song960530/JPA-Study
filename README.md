@@ -316,3 +316,27 @@ ORM (객체와 관계형 데이터베이스 매핑)
   - **✨실무에서 사용 권장✨**
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+### JPQL 문법
+![JPQL 기본문법 형태](https://user-images.githubusercontent.com/52727315/153711704-e1d2a965-ff47-4631-b172-f9f4b406c743.png)
+  - 엔티티와 속성(변수)은 대소문자를 구분하며, JPQL키워드는 대소문자를 구분하지 않음(SELECT,FROM...)
+  - FROM 절은 테이블명이 아닌 엔티티 이름으로 사용하고 별칭(알리아스)는 필수로 사용해야한다
+
+### TypeQuery
+  - 반환 타입이 명활할 경우 사용한다
+```java
+// 예제 소스
+TypedQuery<Member> query = em.createQuery("SELECT m FROM Member m", Member.class);
+```
+
+### Query
+  - 반환 타입이 명확하지 않을 경우 사용한다
+```java
+// 예제 소스
+Query query = em.createQuery("SELECT m.username, m.age from Member m");
+```
+
+### 결과 조회API
+  - getResultList() : 하나 이상의 결과를 리턴받으며 결과가 없으면 빈 리스트를 리턴한다
+  - getSingleResult() : 단일 객체를 반환하며 결과가 없거나 둘 이상이면 Exception을 발생시킨다. **🔥꼭 조회된 객체가 하나가 있어야함 🔥**
+
