@@ -340,3 +340,15 @@ Query query = em.createQuery("SELECT m.username, m.age from Member m");
   - getResultList() : 하나 이상의 결과를 리턴받으며 결과가 없으면 빈 리스트를 리턴한다
   - getSingleResult() : 단일 객체를 반환하며 결과가 없거나 둘 이상이면 Exception을 발생시킨다. **🔥꼭 조회된 객체가 하나가 있어야함 🔥**
 
+### 프로젝션
+  - Select 대상을 지정하는것
+  - 엔티티 프로젝션, 임베디드 타입 프로젝션, 스칼라 타입 프로젝션이 있다
+  - 조회하여 결과값을 반환받을 땐 Query 타입, Object[] 타입, new 명령어 타입으로 조회하여 반환받을 수 있다
+  - new 명령어로 조회할 시 jpql에선 패키지경로를 다 적어줘야한다 (이후 querydsl에서 다른방법으로 극복 가능)
+```java
+// 가장 많이 사용하는 new 명령어 조회 
+em.createQuery(SELECT new jpabook.jpql.UserDTO(m.username, m.age) FROM Member m,MemberDTO.class).getResultList();
+```
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
