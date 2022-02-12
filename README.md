@@ -350,5 +350,9 @@ Query query = em.createQuery("SELECT m.username, m.age from Member m");
 em.createQuery(SELECT new jpabook.jpql.UserDTO(m.username, m.age) FROM Member m,MemberDTO.class).getResultList();
 ```
 
+### 페이징API
+  - **✨아래 두개의 API로 추상화되어있으며, 각 DB의 방언에 맞게 변환하여 페이징처리가 되도록 해준다✨**
+  - setFirstResult(int startPosition) : 조회 시작 위치 (0부터)
+  - setMaxResults(int maxResult) : 조회 데이터 수
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
