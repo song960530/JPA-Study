@@ -378,4 +378,8 @@ SELECT m,t FROM Member m LEFT JOIN m.team t ON t.name = 'A'
 // SQL
 SELECT m.*, t.* FROM Member m LEFT OUTER JOIN Team t ON m.TEAM_ID = t.ID AND t.name = 'A'
 ```
+
+### 서브쿼리
+  - JPA자체에선 WHERE, HAVING절에서만 사용이 가능하지만 SELECT절에서도 가능하도록 하이버네이트가 지원해준다
+  - 다만 FROM절의 서브쿼리는 아직도 불가능하다 -> 가능하면 조인기능을 활용하여 풀어내도록 하자
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
