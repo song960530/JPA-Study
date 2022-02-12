@@ -355,4 +355,27 @@ em.createQuery(SELECT new jpabook.jpql.UserDTO(m.username, m.age) FROM Member m,
   - setFirstResult(int startPosition) : 조회 시작 위치 (0부터)
   - setMaxResults(int maxResult) : 조회 데이터 수
 
+### 조인
+  - 내부조인
+```java
+SELECT m FROM Member m [INNER] JOIN m.team t
+```
+  - 외부조인
+```java
+SELECT m FROM Member m LEFT [OUTER] JOIN m.team t
+```
+  - 세타조인
+  - 연관관계 매핑을 사용하지 않고 임의로 조건을 넣어 조회하는 방법
+```java
+SELECT m FROM Member m, TEAM t WHERE m.username = t.name
+```
+  - ON절 (JPA2.1부터 지원)
+    - 조인 대상 필터링 및 연관관계 없는 엔티티 외부 조인을 지원한다(하이버네이트 5.1부터)
+```java
+// JPQL
+SELECT m,t FROM Member m LEFT JOIN m.team t ON t.name = 'A'
+
+// SQL
+SELECT m.*, t.* FROM Member m LEFT OUTER JOIN Team t ON m.TEAM_ID = t.ID AND t.name = 'A'
+```
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
