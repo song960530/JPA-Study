@@ -397,3 +397,49 @@ SELECT m.*, t.* FROM Member m LEFT OUTER JOIN Team t ON m.TEAM_ID = t.ID AND t.n
   - **✨경로탐색을 할 땐 꼭 묵시적 조인이 아닌 명시적 조인을 사용하여 탐색하도록 한다 (그래야 명확히 어떻게 조인이 걸리는지 알 수 있음)✨**
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+### ✨페치 조인(fetch join)✨ 실무에서 정말 중요
+  - JPQL 성능 최적화를 위한 기능
+  - 연관된 엔티티나 컬렉션을 한번에 조회하는 기능 (즉시로딩)
+  - 필요시 쿼리가 실행되는 지연로딩 개념이 아닌 객체 그래프를 한번에 조회하는 개념
+  - [LEFT [OUTER] | INNER] JOIN FETCH 조인경로
+  - 엔티티 페치조인 예제
+```java
+// JPQL
+SELECT m FROM Member m JOIN FETCH m.team
+
+// SQL
+SELECT M.*,T.* FROM MEMBER M INNER JOIN TEAM T ON M.TEAM_ID = T.ID
+```
+  - 컬렉션 페치조인 예제
+```java
+// JPQL
+SELECT t FROM Team t JOIN FETCH t.member
+WHERE t.name = '팀A'
+
+// SQL
+SELECT T.*, M.* FROM TEAM T INNER JOIN MEMBER M ON T.ID = M.TEAM_ID
+WHERE T.TEAM = '팀A'
+```
+  - 페치조인과 DISTINCT
+    - SQL의 DISTINCT 뿐만 아니라 애플리케이션단에서 중복되는 데이터까지 제거해주는 
+```
+Member 1 -> TEAM A
+Member 2 -> TEAM A
+Member 3 -> TEAM B
+위 상황에서 
+
+SELECT t FROM Team t JOIN FETCH t.member WHERE t.name = '팀A' JPQL 실행 시
+
+1.TEAM A 
+  - Member1
+  - Member2
+2.TEAM A
+  - Member1
+  - Member2 
+와 같이 중복된 데이터가 조회되나, DISTINCT를 붙여서 조회시
+어플리케이션단에서 엔티티가 중복되는것을 제거해줌
+```
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
