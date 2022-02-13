@@ -402,6 +402,7 @@ SELECT m.*, t.* FROM Member m LEFT OUTER JOIN Team t ON m.TEAM_ID = t.ID AND t.n
   - JPQL 성능 최적화를 위한 기능
   - 연관된 엔티티나 컬렉션을 한번에 조회하는 기능 (즉시로딩)
   - 필요시 쿼리가 실행되는 지연로딩 개념이 아닌 객체 그래프를 한번에 조회하는 개념
+  - 지연 로딩으로 발생할 수 있는 N + 1 문제(하나의 쿼리 실행 후 데이터만큼 조인쿼리가 실행되는 문제)의 대안책 
   - [LEFT [OUTER] | INNER] JOIN FETCH 조인경로
   - 엔티티 페치조인 예제
 ```java
