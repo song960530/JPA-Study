@@ -1,0 +1,21 @@
+spring:
+#  datasource:
+#    url: jdbc:h2:mem:test
+#    username: sa
+#    password:
+#    driver-class-name: org.h2.Driver
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: create
+#    properties:
+#      hibernate:
+#        show_sql: true # sout으로 찍히는걸 설정하는부분 운영에선 주석처리해야함
+#        format_sql: true
+#    database-platform: org.hibernate.dialect.H2Dialect
+
+logging:
+  level:
+    org.hibernate: debug
+    org.hibernate.type: trace # SQL 파라미터를 남긴다
+
