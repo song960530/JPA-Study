@@ -48,7 +48,7 @@ public class OrderService {
     /**
      * 주문 취소
      */
-    public void cancel(Long orderId) {
+    public void cancelOrder(Long orderId) {
         // 주문 엔티티 조회
         Order order = orderRepository.findOne(orderId);
 
