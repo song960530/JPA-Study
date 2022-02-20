@@ -16,7 +16,7 @@ public class HelloController {
         return "hello";
     }
 
-    @RequestMapping
+    @RequestMapping("/")
     public String home() {
         log.debug("home Controller");
         return "home";
