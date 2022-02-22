@@ -7,7 +7,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     properties:
       hibernate:
         show_sql: true # sout으로 찍히는걸 설정하는부분 운영에선 주석처리해야함
