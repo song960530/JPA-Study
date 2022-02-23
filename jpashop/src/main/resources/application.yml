@@ -12,6 +12,7 @@ spring:
       hibernate:
 #        show_sql: true # sout으로 찍히는걸 설정하는부분 운영에선 주석처리해야함
         format_sql: true
+        default_batch_fetch_size: 100
     database-platform: org.hibernate.dialect.H2Dialect
 
 logging:
