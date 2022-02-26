@@ -49,7 +49,7 @@ public class OrderQueryRepository {
                         " where oi.order.id in :orderIds", OrderItemQueryDto.class)
                 .setParameter("orderIds", orderIds)
                 .getResultList();
-    
+
         Map<Long, List<OrderItemQueryDto>> orderItemMap = orderItems.stream().collect(Collectors.groupingBy(o -> o.getOrderId()));
 
         result.forEach(o -> o.setOrderItems(orderItemMap.get(o.getOrderId())));
