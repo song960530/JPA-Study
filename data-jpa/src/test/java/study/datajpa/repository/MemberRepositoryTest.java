@@ -10,7 +10,9 @@ import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 import study.datajpa.entity.Team;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -135,5 +137,33 @@ class MemberRepositoryTest {
         // then
         assertEquals(memberDtos.get(0).getTeamName(), "teamA");
         assertEquals(memberDtos.get(0).getUsername(), "AAA");
+    }
+
+    @Test
+    public void findByNames() throws Exception {
+        // given
+        Member member1 = new Member("AAA", 10);
+        Member member2 = new Member("BBB", 20);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        // when
+        List<Member> result = memberRepository.findByNames(Arrays.asList("AAA", "BBB"));
+
+        // then
+        assertEquals(result.get(0).getUsername(), "AAA");
+        assertEquals(result.get(1).getUsername(), "BBB");
+    }
+
+    @Test
+    public void findTest() throws Exception {
+        // given
+        Member member1 = new Member("AAA", 10);
+        memberRepository.save(member1);
+
+        // when
+        List<Member> result1 = memberRepository.findListByUsername("AAA");
+        Member result2 = memberRepository.findMemberByUsername("AAA");
+        Optional<Member> result3 = memberRepository.findOptionalByUsername("AAA");
     }
 }
