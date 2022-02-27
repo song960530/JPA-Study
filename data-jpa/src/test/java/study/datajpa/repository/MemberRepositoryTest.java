@@ -5,6 +5,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
@@ -165,5 +168,40 @@ class MemberRepositoryTest {
         List<Member> result1 = memberRepository.findListByUsername("AAA");
         Member result2 = memberRepository.findMemberByUsername("AAA");
         Optional<Member> result3 = memberRepository.findOptionalByUsername("AAA");
+    }
+
+    @Test
+    public void paging() throws Exception {
+        // given
+        Member member1 = new Member("Member1", 10);
+        Member member2 = new Member("Member2", 10);
+        Member member3 = new Member("Member3", 10);
+        Member member4 = new Member("Member4", 10);
+        Member member5 = new Member("Member5", 10);
+
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
+        memberRepository.save(member4);
+        memberRepository.save(member5);
+
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+        // when
+        Page<Member> result = memberRepository.findByAge(10, pageRequest);
+        List<Member> content = result.getContent();
+        long count = result.getTotalElements();
+
+        Page<MemberDto> toMap = result.map(m -> new MemberDto(m));
+
+        // then
+        for (Member member : content) {
+            System.out.println("member = " + member);
+        }
+        assertEquals(content.size(), 3);
+        assertEquals(count, 5);
+        assertEquals(result.getNumber(), 0);
+        assertEquals(result.isFirst(), true);
+        assertEquals(result.hasNext(), true);
     }
 }
