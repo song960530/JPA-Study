@@ -6,7 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
+import study.datajpa.entity.Team;
 
 import java.util.List;
 
@@ -17,6 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class MemberRepositoryTest {
     @Autowired
     MemberRepository memberRepository;
+    @Autowired
+    TeamRepository teamRepository;
 
     @Test
     public void testMember() throws Exception {
@@ -73,7 +77,7 @@ class MemberRepositoryTest {
         memberRepository.save(member2);
 
         // when
-        List<Member> result = memberRepository.findByUsernameAndAgeGreaterThan("BBB",15);
+        List<Member> result = memberRepository.findByUsernameAndAgeGreaterThan("BBB", 15);
 
         // then
         assertEquals(result.get(0).getUsername(), "BBB");
@@ -82,4 +86,54 @@ class MemberRepositoryTest {
 
     }
 
+    @Test
+    public void testQuery() throws Exception {
+        // given
+        Member member1 = new Member("AAA", 10);
+        Member member2 = new Member("BBB", 20);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        // when
+        List<Member> result = memberRepository.findUser("BBB", 20);
+
+        // then
+        assertEquals(result.get(0).getUsername(), "BBB");
+        assertEquals(result.get(0).getAge(), 20);
+        assertEquals(result.size(), 1);
+    }
+
+    @Test
+    public void findUsernameList() throws Exception {
+        // given
+        Member member1 = new Member("AAA", 10);
+        Member member2 = new Member("BBB", 20);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        // when
+        List<String> result = memberRepository.findUsernameList();
+
+        // then
+        assertEquals(result.get(0), "AAA");
+        assertEquals(result.get(1), "BBB");
+    }
+
+    @Test
+    public void findMemberDto() throws Exception {
+        // given
+        Team teamA = new Team("teamA");
+        teamRepository.save(teamA);
+
+        Member member1 = new Member("AAA", 10);
+        member1.setTeam(teamA);
+        memberRepository.save(member1);
+
+        // when
+        List<MemberDto> memberDtos = memberRepository.findMemberDto();
+
+        // then
+        assertEquals(memberDtos.get(0).getTeamName(), "teamA");
+        assertEquals(memberDtos.get(0).getUsername(), "AAA");
+    }
 }
