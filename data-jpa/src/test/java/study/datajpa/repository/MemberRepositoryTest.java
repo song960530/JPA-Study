@@ -264,4 +264,38 @@ class MemberRepositoryTest {
 
         // then
     }
+
+    @Test
+    public void 커스텀_레포지토리() throws Exception {
+        // given
+        List<Member> memberCustom = memberRepository.findMemberCustom();
+        // when
+        System.out.println("memberCustom = " + memberCustom);
+        // then
+    }
+
+    @Test
+    public void BaseEntity_테스트() throws Exception {
+        // given
+        Member member = new Member("member");
+        memberRepository.save(member);
+        em.flush();
+        em.clear();
+
+        Thread.sleep(100);
+
+        Member findMember = memberRepository.findById(member.getId()).get();
+        findMember.setUsername("member2");
+        em.flush();
+        em.clear();
+
+        // when
+
+
+        // then
+        System.out.println("findMember = " + findMember.getCreatedBy());
+        System.out.println("findMember = " + findMember.getCreateTime());
+        System.out.println("findMember = " + findMember.getLastModifiedBy());
+        System.out.println("findMember = " + findMember.getUpdateTime());
+    }
 }
