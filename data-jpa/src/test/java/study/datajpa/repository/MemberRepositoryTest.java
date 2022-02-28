@@ -13,6 +13,7 @@ import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 import study.datajpa.entity.Team;
 
+import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,8 @@ class MemberRepositoryTest {
     MemberRepository memberRepository;
     @Autowired
     TeamRepository teamRepository;
+    @Autowired
+    EntityManager em;
 
     @Test
     public void testMember() throws Exception {
@@ -203,5 +206,47 @@ class MemberRepositoryTest {
         assertEquals(result.getNumber(), 0);
         assertEquals(result.isFirst(), true);
         assertEquals(result.hasNext(), true);
+    }
+
+    @Test
+    public void 벌크업데이트() throws Exception {
+        // given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 19));
+        memberRepository.save(new Member("member3", 20));
+        memberRepository.save(new Member("member4", 21));
+        memberRepository.save(new Member("member5", 40));
+
+        // when
+        int resultCount = memberRepository.bulkAgePlus(20);
+
+//        em.clear();
+
+        Member findMember = memberRepository.findMemberByUsername("member5");
+
+        // then
+        assertEquals(resultCount, 3);
+        assertEquals(findMember.getAge(), 41);
+    }
+
+    @Test
+    public void EntityGraph_테스트() throws Exception {
+        // given
+        Team teamA = new Team("teamA");
+        teamRepository.save(teamA);
+        memberRepository.save(new Member("member1", 10, teamA));
+        memberRepository.save(new Member("member2", 19, teamA));
+        memberRepository.save(new Member("member3", 20, teamA));
+        memberRepository.save(new Member("member4", 21, teamA));
+        memberRepository.save(new Member("member5", 40, teamA));
+
+        // when
+//        List<Member> findAll = memberRepository.findAll();
+        List<Member> findAll = memberRepository.findEntityGraphByAgeGreaterThanEqual(10);
+
+        // then
+        for (Member member : findAll) {
+            System.out.println("member = " + member.getTeam().getName());
+        }
     }
 }
