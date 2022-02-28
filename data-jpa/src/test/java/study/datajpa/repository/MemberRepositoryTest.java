@@ -249,4 +249,19 @@ class MemberRepositoryTest {
             System.out.println("member = " + member.getTeam().getName());
         }
     }
+
+    @Test
+    public void QueryHint테스트() throws Exception {
+        // given
+        Member member = new Member("member1", 10);
+        memberRepository.save(member);
+        em.flush();
+        em.clear();
+
+        // when
+        Member findMember = memberRepository.findReadOnlyByUsername("member1");
+        findMember.setUsername("asd");
+
+        // then
+    }
 }
