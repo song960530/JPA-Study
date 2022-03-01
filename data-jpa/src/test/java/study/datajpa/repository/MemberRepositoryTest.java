@@ -299,4 +299,20 @@ class MemberRepositoryTest {
         System.out.println("findMember = " + findMember.getLastModifiedBy());
         System.out.println("findMember = " + findMember.getUpdateTime());
     }
+
+    @Test
+    public void 네이티브쿼리_테스트() throws Exception {
+        // given
+        Member member = new Member("member");
+        memberRepository.save(member);
+
+        em.flush();
+        em.clear();
+
+        // when
+        Member findMember = memberRepository.findByNativeQuery("member");
+
+        // then
+        assertEquals(findMember.getUsername(), member.getUsername());
+    }
 }
