@@ -1,17 +1,21 @@
 package study.querydsl;
 
+import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.entity.Member;
+import study.querydsl.entity.QMember;
 import study.querydsl.entity.Team;
 import study.querydsl.repository.MemberRepository;
 import study.querydsl.repository.TeamRepository;
 
 import javax.persistence.EntityManager;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static study.querydsl.entity.QMember.member;
@@ -26,11 +30,11 @@ class QuerydslBasicTests {
     @Autowired
     TeamRepository teamRepository;
 
-    JPAQueryFactory jpaQueryFactory;
+    JPAQueryFactory queryFactory;
 
     @BeforeEach
     public void init() {
-        jpaQueryFactory = new JPAQueryFactory(em);
+        queryFactory = new JPAQueryFactory(em);
         Team teamA = new Team("teamA");
         Team teamB = new Team("teamB");
         teamRepository.save(teamA);
@@ -51,12 +55,47 @@ class QuerydslBasicTests {
         // given
 
         // when
-        Member findMember = jpaQueryFactory
+        Member findMember = queryFactory
                 .select(member)
                 .from(member)
                 .where(member.username.eq("member1")).fetchOne();
 
         // then
         assertEquals(findMember.getUsername(), "member1");
+    }
+
+    @Test
+    public void search() throws Exception {
+        // given
+
+        // when
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .where(
+                        member.username.eq("member1")
+                        , member.age.eq(10)
+                )
+                .fetchOne();
+
+        // then
+        assertEquals(findMember.getUsername(), "member1");
+    }
+
+    @Test
+    @DisplayName("다양한 결과조회 방법")
+    public void resultFetch() throws Exception {
+        // given
+
+        // when
+        List<Member> fetch = queryFactory.selectFrom(member).fetch(); // 리스트 조회
+//        Member fetchOne = queryFactory.selectFrom(QMember.member).fetchOne(); // 단건 조회
+        Member fetchFirst = queryFactory.selectFrom(QMember.member).fetchFirst(); // 첫번째 값 조회
+
+        QueryResults<Member> results = queryFactory.selectFrom(member).fetchResults(); // 페이징 정보 포함 조회
+        List<Member> result = results.getResults(); // contents 보는법
+        long total = results.getTotal();// count 보는법
+
+        long count = queryFactory.selectFrom(member).fetchCount(); // count 조회
+        // then
     }
 }
