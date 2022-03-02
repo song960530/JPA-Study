@@ -222,4 +222,58 @@ class QuerydslBasicTests {
         assertEquals(result.get(0).getUsername(), "member1");
         assertEquals(result.get(1).getUsername(), "member2");
     }
+
+    /**
+     * 회원과 팀을 조인하면서 팀 이름이 teamA인 팀만 조인, 회원은 모두 조회
+     * JPQL : select m,t from Member m left join m.team t on t.name = 'teamA'
+     */
+    @DisplayName("join 테스트")
+    @Test
+    public void joinOnFiltering() throws Exception {
+        // given
+
+        // when
+        List<Tuple> result = queryFactory
+                .select(member, team)
+                .from(member)
+                .leftJoin(member.team, team)
+                .on(team.name.eq("teamA"))
+                .fetch();
+
+        // then
+        for (Tuple tuple : result) {
+            System.out.println("tuple = " + tuple);
+        }
+
+        assertEquals(result.get(0).get(team).getId(), 1);
+        assertEquals(result.get(1).get(team).getId(), 1);
+        assertEquals(result.get(2).get(team), null);
+        assertEquals(result.get(3).get(team), null);
+    }
+
+    /**
+     * 연관관계가 없는 엔티티 외부 조인
+     * 회원의 이름이 팀 이름과 같은 대상 외부 조인
+     */
+    @DisplayName("연관관계가 없는 엔티티 join 테스트")
+    @Test
+    public void joinOnNoRelation() throws Exception {
+        // given
+        memberRepository.save(new Member("teamA"));
+        memberRepository.save(new Member("teamB"));
+        memberRepository.save(new Member("teamC"));
+
+        // when
+        List<Tuple> result = queryFactory
+                .select(member, team)
+                .from(member)
+                .leftJoin(team)
+                .on(member.username.eq(team.name))
+                .fetch();
+
+        // then
+        for (Tuple tuple : result) {
+            System.out.println("tuple = " + tuple);
+        }
+    }
 }
