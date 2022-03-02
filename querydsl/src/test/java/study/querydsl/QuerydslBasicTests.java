@@ -20,6 +20,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static study.querydsl.entity.QMember.member;
+import static study.querydsl.entity.QTeam.team;
 
 @SpringBootTest
 @Transactional
@@ -173,5 +174,32 @@ class QuerydslBasicTests {
         assertEquals(tuple.get(member.age.avg()), 25);
         assertEquals(tuple.get(member.age.max()), 40);
         assertEquals(tuple.get(member.age.min()), 10);
+    }
+
+    /**
+     * 팀의 이름과 각 팀의 평균 연령을 구하라
+     */
+    @DisplayName("GroupBY 사용법")
+    @Test
+    public void groupByTest() throws Exception {
+        // given
+
+        // when
+        List<Tuple> result = queryFactory
+                .select(team.name, member.age.avg())
+                .from(member)
+                .join(member.team, team)
+                .groupBy(team.name)
+                .fetch();
+
+        Tuple teamA = result.get(0);
+        Tuple teamB = result.get(1);
+
+        // then
+        assertEquals(teamA.get(team.name), "teamA");
+        assertEquals(teamA.get(member.age.avg()), 15);
+
+        assertEquals(teamB.get(team.name), "teamB");
+        assertEquals(teamB.get(member.age.avg()), 35);
     }
 }
