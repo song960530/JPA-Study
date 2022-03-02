@@ -1,6 +1,7 @@
 package study.querydsl;
 
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -145,5 +146,32 @@ class QuerydslBasicTests {
         assertEquals(result.getTotal(), 4);
         assertEquals(result.getLimit(), 2);
         assertEquals(result.getOffset(), 0);
+    }
+
+    @Test
+    @DisplayName("집합(Tuple 사용법)")
+    public void aggregation() throws Exception {
+        // given
+
+        // when
+        List<Tuple> result = queryFactory
+                .select(
+                        member.count()
+                        , member.age.sum()
+                        , member.age.avg()
+                        , member.age.max()
+                        , member.age.min()
+                )
+                .from(member)
+                .fetch();
+
+        Tuple tuple = result.get(0);
+
+        // then
+        assertEquals(tuple.get(member.count()), 4);
+        assertEquals(tuple.get(member.age.sum()), 100);
+        assertEquals(tuple.get(member.age.avg()), 25);
+        assertEquals(tuple.get(member.age.max()), 40);
+        assertEquals(tuple.get(member.age.min()), 10);
     }
 }
