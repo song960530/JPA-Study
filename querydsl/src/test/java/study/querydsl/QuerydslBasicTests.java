@@ -125,4 +125,25 @@ class QuerydslBasicTests {
         assertEquals(result.get(1).getUsername(), "member6");
         assertEquals(result.get(2).getUsername(), null);
     }
+
+    @Test
+    @DisplayName("페이징 테스트")
+    public void paging1() throws Exception {
+        // given
+
+        // when
+        QueryResults<Member> result = queryFactory
+                .selectFrom(member)
+                .orderBy(member.username.desc())
+                .offset(0)
+                .limit(2)
+                .fetchResults();
+
+        // then
+        assertEquals(result.getResults().size(), 2);
+        assertEquals(result.getResults().get(0).getUsername(), "member4");
+        assertEquals(result.getTotal(), 4);
+        assertEquals(result.getLimit(), 2);
+        assertEquals(result.getOffset(), 0);
+    }
 }
