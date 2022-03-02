@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.QMember;
@@ -201,5 +202,24 @@ class QuerydslBasicTests {
 
         assertEquals(teamB.get(team.name), "teamB");
         assertEquals(teamB.get(member.age.avg()), 35);
+    }
+
+    @Rollback(value = false)
+    @DisplayName("기본 조인 테스트")
+    @Test
+    public void joinTest() throws Exception {
+        // given
+
+        // when
+        List<Member> result = queryFactory
+                .selectFrom(member)
+                .leftJoin(member.team, team)
+                .where(team.name.eq("teamA"))
+                .orderBy(member.username.asc())
+                .fetch();
+
+        // then
+        assertEquals(result.get(0).getUsername(), "member1");
+        assertEquals(result.get(1).getUsername(), "member2");
     }
 }
