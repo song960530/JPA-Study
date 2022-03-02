@@ -96,6 +96,33 @@ class QuerydslBasicTests {
         long total = results.getTotal();// count 보는법
 
         long count = queryFactory.selectFrom(member).fetchCount(); // count 조회
+
         // then
+    }
+
+    /**
+     * 회원 정렬 순서
+     * 1. 회원 나이 내림차순
+     * 2. 회원 이름 올림차순
+     * 단 2에서 회원 이름이 없으면 마지막에 출력(nulls last)
+     */
+    @Test
+    @DisplayName("정렬 테스트")
+    public void sort() throws Exception {
+        // given
+        memberRepository.save(new Member(null, 100));
+        memberRepository.save(new Member("member5", 100));
+        memberRepository.save(new Member("member6", 100));
+
+        // when
+        List<Member> result = queryFactory.selectFrom(member)
+                .where(member.age.eq(100))
+                .orderBy(member.age.desc(), member.username.asc().nullsLast())
+                .fetch();
+
+        // then
+        assertEquals(result.get(0).getUsername(), "member5");
+        assertEquals(result.get(1).getUsername(), "member6");
+        assertEquals(result.get(2).getUsername(), null);
     }
 }
