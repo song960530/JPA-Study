@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.QMember;
@@ -17,6 +16,8 @@ import study.querydsl.repository.MemberRepository;
 import study.querydsl.repository.TeamRepository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceUnit;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,6 +27,8 @@ import static study.querydsl.entity.QTeam.team;
 @SpringBootTest
 @Transactional
 class QuerydslBasicTests {
+    @PersistenceUnit
+    EntityManagerFactory emf;
     @Autowired
     EntityManager em;
     @Autowired
@@ -204,7 +207,6 @@ class QuerydslBasicTests {
         assertEquals(teamB.get(member.age.avg()), 35);
     }
 
-    @Rollback(value = false)
     @DisplayName("기본 조인 테스트")
     @Test
     public void joinTest() throws Exception {
@@ -245,8 +247,6 @@ class QuerydslBasicTests {
             System.out.println("tuple = " + tuple);
         }
 
-        assertEquals(result.get(0).get(team).getId(), 1);
-        assertEquals(result.get(1).get(team).getId(), 1);
         assertEquals(result.get(2).get(team), null);
         assertEquals(result.get(3).get(team), null);
     }
@@ -275,5 +275,23 @@ class QuerydslBasicTests {
         for (Tuple tuple : result) {
             System.out.println("tuple = " + tuple);
         }
+    }
+
+
+    @Test
+    public void fetchJoinTest() throws Exception {
+        // given
+        em.flush();
+        em.clear();
+
+        // when
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .join(member.team, team).fetchJoin()
+                .where(member.username.eq("member1"))
+                .fetchOne();
+
+        // then
+        assertEquals(emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam()), true);
     }
 }
