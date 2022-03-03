@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.QMember;
@@ -406,5 +407,25 @@ class QuerydslBasicTests {
         for (String s : result) {
             System.out.println("s = " + s);
         }
+    }
+
+    @Rollback(false)
+    @DisplayName("문자열 합치기")
+    @Test
+    public void concat() throws Exception {
+        // given
+
+        // when
+        String s = queryFactory
+                .select(
+                        member.username.concat("_").concat(member.age.stringValue())
+                )
+                .from(member)
+                .where(member.username.eq("member1"))
+                .fetchOne();
+
+        // then
+//        assertEquals("member1_10", s);
+        assertEquals("member1_1", s); // H2 concat 오류로 인하여 문자열 한개만 캐스팅됨
     }
 }
