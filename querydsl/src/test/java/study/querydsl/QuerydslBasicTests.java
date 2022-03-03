@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.dto.MemberDto;
+import study.querydsl.dto.QMemberDto;
 import study.querydsl.dto.UserDto;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.QMember;
@@ -486,5 +487,42 @@ class QuerydslBasicTests {
         // then
         assertEquals("member1", result.get(0).getUsername());
 
+    }
+
+    @DisplayName("DTO로 조회하는 방법_@QueryProjection")
+    @Test
+    public void findDtoByQueryProjection() throws Exception {
+        // given
+
+        // when
+        List<MemberDto> result = queryFactory
+                .select(new QMemberDto(
+                                member.username,
+                                member.age
+                        )
+                )
+                .from(member)
+                .fetch();
+
+        // then
+        assertEquals("member1", result.get(0).getUsername());
+    }
+
+    @DisplayName("DTO로 조회하는 방법_@QueryProjection2")
+    @Test
+    public void findDtoByQueryProjection2() throws Exception {
+        // given
+
+        // when
+        List<MemberDto> result = queryFactory
+                .select(new QMemberDto(
+                                member.username
+                        )
+                )
+                .from(member)
+                .fetch();
+
+        // then
+        assertEquals("member1", result.get(0).getUsername());
     }
 }
