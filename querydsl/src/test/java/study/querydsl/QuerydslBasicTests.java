@@ -1,5 +1,6 @@
 package study.querydsl;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
@@ -524,5 +525,35 @@ class QuerydslBasicTests {
 
         // then
         assertEquals("member1", result.get(0).getUsername());
+    }
+
+    @Test
+    @DisplayName("BooleanBuilder를 사용한 동적 쿼리")
+    public void booleanuBuilder() throws Exception {
+        // given
+        String usernameParam = "member1";
+        Integer ageParam = 10;
+
+        // when
+        List<Member> result = searchMember1(usernameParam, ageParam);
+
+        // then
+        assertEquals(usernameParam, result.get(0).getUsername());
+        assertEquals(ageParam, result.get(0).getAge());
+
+    }
+
+    private List<Member> searchMember1(String usernameParam, Integer ageParam) {
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (usernameParam != null) builder.and(member.username.eq(usernameParam));
+        if (ageParam != null) builder.and(member.age.eq(ageParam));
+
+        return queryFactory
+                .selectFrom(member)
+                .where(builder)
+                .fetch();
+
     }
 }
