@@ -3,7 +3,9 @@ package study.querydsl;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -529,7 +531,7 @@ class QuerydslBasicTests {
 
     @Test
     @DisplayName("BooleanBuilder를 사용한 동적 쿼리")
-    public void booleanuBuilder() throws Exception {
+    public void dynamicQuery_booleanuBuilder() throws Exception {
         // given
         String usernameParam = "member1";
         Integer ageParam = 10;
@@ -556,4 +558,42 @@ class QuerydslBasicTests {
                 .fetch();
 
     }
+
+    @Test
+    @DisplayName("Where 다중파라미터를 사용한 동적 쿼리")
+    public void dynamicQuery_where() throws Exception {
+        // given
+        String usernameParam = "member1";
+        Integer ageParam = 10;
+
+        // when
+        List<Member> result = searchMember2(usernameParam, ageParam);
+
+        // then
+        assertEquals(usernameParam, result.get(0).getUsername());
+        assertEquals(ageParam, result.get(0).getAge());
+
+    }
+
+    private List<Member> searchMember2(String usernameParam, Integer ageParam) {
+        return queryFactory
+                .selectFrom(member)
+//                .where(userNameEq(usernameParam), ageEq(ageParam))
+                .where(allEq(usernameParam, ageParam))
+                .fetch();
+    }
+
+    private BooleanExpression ageEq(Integer ageParam) {
+        return ageParam != null ? member.age.eq(ageParam) : null;
+    }
+
+
+    private BooleanExpression userNameEq(String usernameParam) {
+        return usernameParam != null ? member.username.eq(usernameParam) : null;
+    }
+
+    private BooleanExpression allEq(String usernameParam, Integer ageParam) {
+        return userNameEq(usernameParam).and(ageEq(ageParam));
+    }
+
 }
