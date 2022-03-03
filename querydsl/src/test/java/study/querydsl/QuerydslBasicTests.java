@@ -2,6 +2,7 @@ package study.querydsl;
 
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+import study.querydsl.dto.MemberDto;
+import study.querydsl.dto.UserDto;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.QMember;
 import study.querydsl.entity.Team;
@@ -409,7 +412,6 @@ class QuerydslBasicTests {
         }
     }
 
-    @Rollback(false)
     @DisplayName("문자열 합치기")
     @Test
     public void concat() throws Exception {
@@ -427,5 +429,62 @@ class QuerydslBasicTests {
         // then
 //        assertEquals("member1_10", s);
         assertEquals("member1_1", s); // H2 concat 오류로 인하여 문자열 한개만 캐스팅됨
+    }
+
+    @DisplayName("DTO로 조회하는 방법_setter")
+    @Test
+    public void findDtoBySetter() throws Exception {
+        // given
+
+        // when
+        List<MemberDto> result = queryFactory
+                .select(Projections.bean(MemberDto.class,
+                        member.username,
+                        member.age
+                ))
+                .from(member)
+                .fetch();
+
+        // then
+        assertEquals("member1", result.get(0).getUsername());
+
+    }
+
+    @DisplayName("DTO로 조회하는 방법_field")
+    @Test
+    public void findDtoByField() throws Exception {
+        // given
+
+        // when
+        List<UserDto> result = queryFactory
+                .select(Projections.fields(UserDto.class,
+                        member.username.as("name"),
+                        member.age
+                ))
+                .from(member)
+                .fetch();
+
+        // then
+        assertEquals("member1", result.get(0).getName());
+
+    }
+
+    @DisplayName("DTO로 조회하는 방법_constructor")
+    @Test
+    public void findDtoByConstructor() throws Exception {
+        // given
+
+        // when
+        List<MemberDto> result = queryFactory
+                .select(Projections.constructor(MemberDto.class,
+                        member.username,
+                        member.age
+                ))
+                .from(member)
+                .fetch();
+
+        // then
+        assertEquals("member1", result.get(0).getUsername());
+
     }
 }
