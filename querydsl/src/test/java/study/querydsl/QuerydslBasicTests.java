@@ -594,4 +594,83 @@ class QuerydslBasicTests {
         return userNameEq(usernameParam).and(ageEq(ageParam));
     }
 
+    @DisplayName("update bulk연산_Update")
+    @Test
+    public void bulkUpdate() {
+
+        // given
+
+        // when
+        long count = queryFactory
+                .update(member)
+                .set(member.username, "비회원")
+                .where(member.age.lt(28))
+                .execute();
+
+        // 주의 벌크연산 이후엔 영속성 컨텍스트를 비워주자
+        em.flush();
+        em.clear();
+
+        // then
+        assertEquals(2, count);
+    }
+
+    @DisplayName("update bulk연산_add")
+    @Test
+    public void bulkAdd() {
+
+        // given
+
+        // when
+        long count = queryFactory
+                .update(member)
+                .set(member.age, member.age.add(1))
+                .execute();
+
+        // 주의 벌크연산 이후엔 영속성 컨텍스트를 비워주자
+        em.flush();
+        em.clear();
+
+        // then
+        assertEquals(4, count);
+    }
+
+    @DisplayName("update bulk연산_multiply")
+    @Test
+    public void bulkMultiply() {
+
+        // given
+
+        // when
+        long count = queryFactory
+                .update(member)
+                .set(member.age, member.age.multiply(2))
+                .execute();
+
+        // 주의 벌크연산 이후엔 영속성 컨텍스트를 비워주자
+        em.flush();
+        em.clear();
+
+        // then
+        assertEquals(4, count);
+    }
+
+    @DisplayName("update bulk연산_delete")
+    @Test
+    public void bulkDelete() {
+
+        // given
+
+        // when
+        long count = queryFactory
+                .delete(member)
+                .execute();
+
+        // 주의 벌크연산 이후엔 영속성 컨텍스트를 비워주자
+        em.flush();
+        em.clear();
+
+        // then
+        assertEquals(4, count);
+    }
 }
