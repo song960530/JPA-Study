@@ -3,9 +3,11 @@ package study.querydsl;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -672,5 +674,23 @@ class QuerydslBasicTests {
 
         // then
         assertEquals(4, count);
+    }
+
+    @Test
+    @DisplayName("Sql Function호출법_replace")
+    public void sqlFunction() throws Exception {
+        // given
+
+        // when
+        List<String> result = queryFactory
+                .select(Expressions.stringTemplate(
+                        "function('replace', {0}, {1}, {2})",
+                        member.username, "member", "sss"
+                ))
+                .from(member)
+                .fetch();
+
+        // then
+        assertEquals("sss1", result.get(0));
     }
 }
