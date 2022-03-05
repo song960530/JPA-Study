@@ -158,8 +158,17 @@ public List<OrderSimpleQueryDto> findOrderDtos() {
 - 첫번째. ToOne 연관관계를 모두 페치조인하여 조회한다
 - 두번째. 컬렉션들은 지연로딩을 사용하여 조회한다
 - 추가적으로 지연로등 성능 최적화를 위해 최적화 설정을 적용한다
+  - 배치사이즈 설정을 하면 지연로딩을 사용하여 처리를 해야했던 N+1 문제가 1+1로 최적화된다 
   - hibernate.default_batch_fetch_size: 글로벌 설정
   - @BatchSize : 개별 최적화
+```java
+// application.yml에 글로벌 설정 
+spring:
+  jpa:
+    properties:
+      hibernate:
+        default_batch_fetch_size: 500 // 사이즈는 100~1000 사이로 성능테스트 후 최적의 설정값을 찾는다
+```
 
 ## 페치 조인을 사용한 페이징 처리 예제
 ```java
@@ -183,4 +192,31 @@ public List<OrderDto> ordersV3_page(@RequestParam(value = "offset",defaultValue 
 	return result;
 }
 ```
+
+## 조회 시 참고사항
+- 위의 예제는 Entity를 사용하여 조회하지만 이외에 DTO를 사용하여 조회하는 방법도 있다.  
+DTO를 사용하여 조회할 경우 성능최적화를 해야할 때 많은 코드를 변경해야한다.  
+허나 성능최적화는 단순한 코드를 복잡한 코드로 몰고가듯 DTO 방식은 SQL을 직접 다루는것과 유사하여 둘 사이의 줄타기가 필요하다
+
+## OSIV성능 촤적화
+- 상황에 따라 실시간 트래픽이 많은 API의 경우 OSIV를 끄고, ADMIN처럼 커넥션을 많이 사용하지 않으면 OSIV를 킨다
+- Open Sesison in View : 하이버네이터
+- Open EntityManager In View : JPA
+- 관례상 OSIV
+```java
+// application.yml
+spring.jpa.open-in-view : true(defalut)/false
+```
+
+![OSIV ON](https://user-images.githubusercontent.com/52727315/156882628-3c482364-e996-4ffb-a092-7fa6830abcf5.png)
+
+- OSIV 전략을 사용하면 DB커넥션 시작 시점부터 API 응답이 끝날 때 까지 영속성 컨텍스트와 DB커넥션을 유지한다
+
+![OSIV OFF](https://user-images.githubusercontent.com/52727315/156882625-b6cf1e6b-56b1-4159-8b1b-aecc65d63cf6.png)
+
+- OSIV를 끄면 트랜잭션 종료 시 영속성 컨텍스트가 닫히고, DB커넥션도 반환하게 된다.
+
+
+
+
 
