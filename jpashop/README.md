@@ -98,12 +98,89 @@ public enum DeliveryStatus {
 
 # ✔활용 2편 내용
 
+## Entity는 외부로 노출시키지 않는다
+
+- 프레젠테이션 계층을 위한 로직이 추가된다
+- API검증을 위한 로직이 들어가게 된다
+- 각각의 API를 위한 요구사항을 담기 어렵다
+- 🔥엔티티가 변경될 경우 API 스펙이 변경되게 된다🔥
+ 
 
 
+## 조회 방식 권장 순서
+- 첫번째. 엔티티 -> DTO로 변환
+- 두번째. 페치 조인으로 성능 최적화(대부분의 이슈가 해결된다)
+- 세번째. 그래도 안되면 DTO로 조회
+- 네번째. 모든방법이 다 안되면 JPA의 네이티브SQL 혹은 JDBC Template사용
+ 
 
+## Entity를 DTO로 변환 예제
+```java
+public List<Order> findAllWithMemberDelivery() {
+  return em.createQuery(
+    "select o from Order o" +
+    " join fetch o.member m" +
+    " join fetch o.delivery d", Order.class)
+  .getResultList();
+}
+```
 
+```java
+// 엔티티로 조회한 후 stream의 map을 사용하여 간단하게 Dto로 변환
+public List<SimpleOrderDto> ordersV3() {
+  List<Order> orders = orderRepository.findAllWithMemberDelivery();
+  List<SimpleOrderDto> result = orders.stream()
+                                      .map(o -> new SimpleOrderDto(o))
+                                      .collect(toList());
+  return result;
+}
+```
 
+## DTO조회 예제
+```java
+// DTO로 바로 조회할 경우 패키지 경로를 Full로 적어줘야한다
+public List<OrderSimpleQueryDto> findOrderDtos() {
+	return em.createQuery(
+  "select new jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryDto(o.id, m.name, o.orderDate, o.status, d.address)" +
+    " from Order o" +
+    " join o.member m" +
+    " join o.delivery d", OrderSimpleQueryDto.class)
+	.getResultList();
+ }
+```
 
+## 페치 조인의 한계
+- 컬렉션을 페치조인하면 페이징이 불가능하다
+  - 1:N 관계에서 N을 기준으로 row가 생성되기 때문
+- 컬렉션에서 페치조인 사용시 메모리에서 페이징을 시도 -> 장애로 이어진다
 
+## 페치 조인 한계 돌파
+- 첫번째. ToOne 연관관계를 모두 페치조인하여 조회한다
+- 두번째. 컬렉션들은 지연로딩을 사용하여 조회한다
+- 추가적으로 지연로등 성능 최적화를 위해 최적화 설정을 적용한다
+  - hibernate.default_batch_fetch_size: 글로벌 설정
+  - @BatchSize : 개별 최적화
 
+## 페치 조인을 사용한 페이징 처리 예제
+```java
+// ToOne 연관관계는 페이징 문제가 되지 않기 때문에 페치조인을 한다
+public List<Order> findAllWithMemberDelivery(int offset, int limit) {
+	return em.createQuery(
+	"select o from Order o" +
+	" join fetch o.member m" +
+	" join fetch o.delivery d", Order.class)
+	.setFirstResult(offset)
+	.setMaxResults(limit)
+	.getResultList();
+}
+```
+```java
+public List<OrderDto> ordersV3_page(@RequestParam(value = "offset",defaultValue = "0") int offset, @RequestParam(value = "limit", defaultValue = "100") int limit) {
+	List<Order> orders = orderRepository.findAllWithMemberDelivery(offset,limit);
+	List<OrderDto> result = orders.stream()
+                                      .map(o -> new OrderDto(o))
+                                      .collect(toList());
+	return result;
+}
+```
 
