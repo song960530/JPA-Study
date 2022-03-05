@@ -191,6 +191,27 @@ public List<OrderDto> ordersV3_page(@RequestParam(value = "offset",defaultValue 
                                       .collect(toList());
 	return result;
 }
+
+
+// 예제를 위하여 Inner Class로 선언
+@Data
+static class OrderDto {
+	private Long orderId;
+	private String name;
+	private LocalDateTime orderDate;
+	private OrderStatus orderStatus;
+	private Address address;
+	private List<OrderItemDto> orderItems;
+
+	public OrderDto(Order order) {
+	    orderId = order.getId();
+	    name = order.getMember().getName();
+	    orderDate = order.getOrderDate();
+	    orderStatus = order.getStatus();
+	    address = order.getDelivery().getAddress();
+	    orderItems = order.getOrderItems().stream().map(OrderItemDto::new).collect(Collectors.toList());
+	}
+}
 ```
 
 ## 조회 시 참고사항
