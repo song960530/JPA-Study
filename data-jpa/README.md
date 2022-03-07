@@ -68,6 +68,60 @@ List<Member> result = em.createQuery("Member.findByUsername",Member.class).setPa
 List<Member> findByUsername(@Param("username") String username);
 ```
 
+# @Query
+- 실행 메소드에 정적 쿼리를 직접 작성하는 방식
+- 이름 없는 Named 쿼리라 할 수 있다
+- 애플리케이션 실행 시점에 문법 오류를 발견할 수 있다
+```java
+// Entity 직접 조회
+@Query("select m from Member m where m.username = :username and m.age = :age")
+List<Member> findUser(@Param("username") String username, @Param("age") int age);
+
+// DTO 조회
+@Query("select new study.datajpa.dto.MemberDto(m.id, m.username, t.name) from Member m join m.team t")
+List<MemberDto> findMemberDto();
+```
+
+# 결과값 반환
+- 컬렉션
+  - 결과가 없으면 빈 컬렉션
+- 단건
+  - 결과가 없으면 null
+    - JPA 에선 결과가 없으면 NoResultException 예외를 발생시키지만 Spring Data JPA가 해당 예외 발생시 null을 리턴해준다
+  - 2건 이상이면 NonUniqueResultException 예외 발생
+
+# Spring Data JPA의 페이징,정렬
+-페이징 정렬 파라미터
+  - Sort : 정렬 기능
+  - Pageable : 페이징 기능 (내부에 Sort 포함) 
+  - 리턴 타입
+    - Page : count 쿼리 결과를 포함한 페이징
+    - Slice : count 쿼리 없이 다음 페이지를 호출해야하는지 확인 (내부적으로 limit+1 조회, 모바일같은곳에서 스크롤로 로딩할때 자주 사용)
+    - List(컬렉션) : count 쿼리 없이 결과만
+```java
+// count 쿼리 사용
+Page<Member> findByUsername(String name, Pageable pageable); 
+
+// count 쿼리 사용 x
+Slice<Member> findByUsername(String name, Pageable pageable);
+
+// count 쿼리 사용 x
+List<Member> findByUsername(String name, Pageable pageable);
+
+// 별도의 count 쿼리 사용
+@Query(value = "select m from Member m", countQuery = "select count(m.username) from Member m")
+Page<Member> findMemberAllCountBy(Pageable pageable);
+
+// 페이지 유지하면서 엔티티 -> DTO로 변환
+Page<Member> page = memberRepository.findByAge(10, pageRequest);
+Page<MemberDto> dtoPage = page.map(m -> new MemberDto(m));
+```
+
+# Count쿼리 참고사항
+- 전체 count쿼리는 매우 무겁다
+- 복잡한 sql 사용시엔 카운트 쿼리를 별도로 불리하는게 성능최적화에 굉장히 좋다
+  - count쿼리엔 left join을 안해도 된다.
+
 
 
 
