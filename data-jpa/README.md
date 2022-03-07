@@ -122,10 +122,100 @@ Page<MemberDto> dtoPage = page.map(m -> new MemberDto(m));
 - 복잡한 sql 사용시엔 카운트 쿼리를 별도로 불리하는게 성능최적화에 굉장히 좋다
   - count쿼리엔 left join을 안해도 된다.
 
+# 벌크성 수정 쿼리
+- 벌크 연산은 영속성 컨텍스트를 무시하고 실행된다. (영속성 컨텍스트에 있는 엔티티와 꼬일 수 있음)
+- 영속성 컨텍스트에 Entity가 없는 상태에서 벌크 연산을 먼저 수행
+- 부득이하게 영속성 컨텍스트에 Entity가 있으면 벌크 연산 후 영속성 컨텍스트 초기화
+```java
+@Modifying
+@Quert("update Member m set m.age = m.age + 1 where m.age >= :age")
+int bulkAgePlus(@Param("age") int age);
+```
+
+# @EntityGraph
+- Spring Data JPA를 사용할 경우 JPQL없이 페치 조인을 사용할 수 있다 (JPQL + @EntityGraph 도 가능)
+```java
+//공통 메서드 오버라이드
+@Override
+@EntityGraph(attributePaths = {"team"})
+List<Member> findAll();
+
+//JPQL + 엔티티 그래프
+@EntityGraph(attributePaths = {"team"})
+@Query("select m from Member m")
+List<Member> findMemberEntityGraph();
+
+//메서드 이름에서 사용
+@EntityGraph(attributePaths = {"team"})
+List<Member> findByUsername(String username)
+```
+
+# 사용자 정의 레포지토리 구현
+- Spring Data JPA 2.x 부터 레포지토리 인터페이스 이름 + Impl 대신  
+사용자 정의 인터페이스명 + Impl 방식도 지원한다.  
+ex) 아래 예제에서 MemberRepositoryImpl 대신 MemberRepositoryCustomImpl로 구현해도 
+```java
+// interface 정의
+public interface MemberRepositoryCustom {
+  ...
+```
+
+```java
+// interface 구현
+@RequiredArgsConstructor
+public class MemberRepositoryImpl implements MemberRepositoryCustom {
+  private final EntityManager em;
+  
+  @Override
+  ....
+  
+```
+
+```java
+// interface 상속
+public interface memberRepository extends JpaRepository<Member,Long>, MemberRepositoryCustom {
+  ...
+```
 
 
 
+# Auditing
+- 등록자,등록일,수정자,수정일을 공통으로 처리할 때 사용
+1. spring boot 설정 클래스에 @EnableJpaAuditing 선언
+2. Entity에 @EntityListeners(AuditingEntityListener.class) 선언
+```java
+// 등록자, 수정자를 처리해주는 AuditorAware 스프링 빈 등록
+// 실무에선 세션이나 시큐리티 로그인 정보에서ID를 받도록 한다
+@Bean
+public AuditorAware<String> auditorProvider() {
+  return () -> Optional.of(UUID.randomUUID().toString());
+}
+```
 
+```java
+// 등록자 수정자가 필요없을 경우를 대비하여 분리하고 타입을 상속받는다
+@EntityListeners(AuditingEntityListener.class)
+@MappedSuperclass
+public class BaseTimeEntity {
+  @CreatedDate
+  @Column(updateable = false)
+  private LocalDateTime createDate;
+  
+  @LastModifiedDate
+  private LocalDateTime lastModifiedDate;
+}
+
+@EntityListeners(AuditingEntityListener.class)
+@MappedSuperclass
+public class BaseEntity extends BaseTimeEntity {
+  @CreatedBy
+  @Column(updatable = false)
+  private String createdBy;
+  
+  @LastModifiedBy
+  private String lastModifiedBy;
+}
+```
 
 
 
